@@ -14,9 +14,9 @@ LOG=/var/log/macmini-mode.log
 status() {
     mode=$(/usr/bin/notifyutil -g "$PREFIX.state" 2>/dev/null | awk '{print $2}')
     case "$mode" in
-        1) mode="始終開啟 always on" ;;
-        2) mode="始終關閉 always off" ;;
-        *) mode="自動 automatic" ;;
+        1) mode="插電或用電池都不睡眠 always on" ;;
+        2) mode="照系統設定睡眠 always off" ;;
+        *) mode="插電時不睡眠 automatic" ;;
     esac
     if /usr/bin/pgrep -x macmini-moded >/dev/null; then daemon="執行中 running"; else daemon="未執行 not running"; mode="-"; fi
     if /usr/bin/pmset -g | grep -q "SleepDisabled[[:space:]]*1"; then awake="開啟 on（合蓋繼續執行 stays awake with the lid closed）"; else awake="關閉 off（正常睡眠 sleeps normally）"; fi

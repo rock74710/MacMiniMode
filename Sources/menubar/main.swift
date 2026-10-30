@@ -15,10 +15,15 @@ let isChinese = Locale.preferredLanguages.first?.hasPrefix("zh") ?? false
 func L(_ zh: String, _ en: String) -> String { isChinese ? zh : en }
 
 // 與 macmini-moded 裡 Mode 的 rawValue / name 對應。
-let modes: [(name: String, title: String)] = [
-    ("auto", L("自動（插電開啟，拔電關閉）", "Automatic (on when plugged in)")),
-    ("on", L("始終開啟（用電池也不睡眠）", "Always On (stays awake on battery)")),
-    ("off", L("始終關閉", "Always Off")),
+let modes: [(name: String, title: String, tip: String)] = [
+    ("auto", L("插電時不睡眠（合蓋也是）", "Stay Awake on Power (Even Lid Closed)"),
+     L("插電時，電腦持續運作，螢幕不會自動關閉。用電池時照系統設定睡眠。",
+       "On power, the Mac keeps running and the screen stays on. On battery, it sleeps normally.")),
+    ("on", L("插電或用電池都不睡眠", "Stay Awake on Power or Battery"),
+     L("插電或用電池都持續運作。電量剩 10% 時，會恢復正常睡眠。",
+       "The Mac keeps running on power or battery. At 10% battery, it sleeps normally again.")),
+    ("off", L("照系統設定睡眠", "Use Normal Sleep Settings"),
+     L("照 macOS 的設定睡眠，合蓋時也會睡眠。", "The Mac follows the macOS sleep settings, including when the lid closes.")),
 ]
 
 func rootDomainFlag(_ key: String) -> Bool {
@@ -67,7 +72,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     var switchItems: [NSMenuItem] = []
     let health = HealthWindowController()
     let lidScreen = LidScreen()
-    let lidScreenItem = NSMenuItem(title: L("合蓋時熄滅螢幕", "Turn Off Screen When Lid Is Closed"), action: #selector(toggleLidScreen), keyEquivalent: "")
+    let lidScreenItem = NSMenuItem(title: L("合蓋時把內建螢幕調成全黑", "Black Out Built-in Screen When Lid Closes"), action: #selector(toggleLidScreen), keyEquivalent: "")
     var stateToken: Int32 = 0
     var timer: Timer?
     var lidTimer: Timer?
@@ -88,15 +93,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             menu.addItem(item)
         }
         menu.addItem(.separator())
+        let header = NSMenuItem(title: L("電腦何時不睡眠", "When the Mac Stays Awake"), action: nil, keyEquivalent: "")
+        header.isEnabled = false
+        menu.addItem(header)
         for (index, mode) in modes.enumerated() {
             let item = NSMenuItem(title: mode.title, action: #selector(selectMode(_:)), keyEquivalent: "")
             item.target = self
+            item.toolTip = mode.tip
             item.tag = index
             switchItems.append(item)
             menu.addItem(item)
         }
+        menu.addItem(.separator())
         lidScreenItem.target = self
-        lidScreenItem.toolTip = L("只關背光，不鎖屏。萬一開蓋後螢幕還是黑的，按鍵盤上的亮度增加鍵（F2）即可。",
+        lidScreenItem.toolTip = L("沒接外接螢幕時才會作用。只把亮度調到 0，不鎖定螢幕。萬一開蓋後螢幕還是黑的，按鍵盤上的亮度增加鍵（F2）即可。",
                                   "Only the backlight is switched off; the Mac does not lock. If the screen is still dark after opening the lid, press the brightness-up key (F2).")
         menu.addItem(lidScreenItem)
         menu.addItem(.separator())

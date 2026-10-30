@@ -39,9 +39,9 @@ enum Mode: UInt64, CaseIterable {
 
     var label: String {
         switch self {
-        case .auto: return L("自動", "Automatic")
-        case .on: return L("始終開啟", "Always On")
-        case .off: return L("始終關閉", "Always Off")
+        case .auto: return L("插電時不睡眠", "Stay Awake on Power")
+        case .on: return L("插電或用電池都不睡眠", "Stay Awake on Power or Battery")
+        case .off: return L("照系統設定睡眠", "Use Normal Sleep Settings")
         }
     }
 }
@@ -127,7 +127,7 @@ func pmset(_ args: [String]) -> Bool {
     return true
 }
 
-// 「始終開啟」時用電池硬撐，電量降到 10% 就放行睡眠，免得直接斷電。回到 15% 以上或接上電源後恢復。
+// 「插電或用電池都不睡眠」時用電池硬撐，電量降到 10% 就放行睡眠，免得直接斷電。回到 15% 以上或接上電源後恢復。
 func updateLowBattery() {
     let was = State.lowBattery
     if State.mode == .on, !onACPower(), let percent = batteryPercent() {
