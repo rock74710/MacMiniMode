@@ -1,4 +1,4 @@
-// 體檢：把「當 Mac mini 用」需要的幾樣東西逐項查一遍，並能把診斷資訊複製出來。
+// 診斷：把「當 Mac mini 用」需要的幾樣東西逐項查一遍，並能把診斷資訊複製出來。
 // 全部是隻讀檢查，不改任何設定。
 
 import AppKit
@@ -94,7 +94,7 @@ enum Health {
         return checks
     }
 
-    /// 給使用者貼到反饋裡的文本。只讀取，不上傳。
+    /// 給使用者貼到回報裡的文本。只讀取，不上傳。
     static func report(_ checks: [HealthCheck]) -> String {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
         let system = ProcessInfo.processInfo.operatingSystemVersionString
@@ -150,7 +150,7 @@ final class HealthWindowController: NSObject {
         refreshButton.bezelStyle = .rounded
 
         let note = NSTextField(wrappingLabelWithString: L(
-            "反饋問題時，點「複製診斷資訊」把結果貼給開發者。內容只會放進剪貼簿，不會上傳。",
+            "回報問題時，點「複製診斷資訊」把結果貼給開發者。內容只會放進剪貼簿，不會上傳。",
             "When reporting a problem, use Copy Diagnostics and paste the result. It only goes to your clipboard; nothing is uploaded."))
         note.font = .systemFont(ofSize: 11)
         note.textColor = .secondaryLabelColor
@@ -168,7 +168,7 @@ final class HealthWindowController: NSObject {
 
         let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 468, height: 300),
                               styleMask: [.titled, .closable], backing: .buffered, defer: false)
-        window.title = L("體檢", "Health Check")
+        window.title = L("診斷", "Health Check")
         window.isReleasedWhenClosed = false
         let host = NSView()
         host.addSubview(content)

@@ -1,7 +1,7 @@
 // macmini-moded — 插電時禁止睡眠（合蓋也繼續跑），拔電時恢復正常睡眠。
-// 以 root 身份作為 LaunchDaemon 執行；--dry-run 只打印不執行。
+// 以 root 身份作為 LaunchDaemon 執行；--dry-run 只印出不執行。
 // 測試用引數（僅 --dry-run 下生效）：--simulate-power=ac|battery、--simulate-battery=<百分比>；--log-file=<路徑> 把日誌寫到指定檔案。
-// 選單欄通過 Darwin 通知切換模式：<prefix>.set-auto / set-on / set-off，當前模式釋出在 <prefix>.state。
+// 選單列通過 Darwin 通知切換模式：<prefix>.set-auto / set-on / set-off，當前模式釋出在 <prefix>.state。
 
 import Foundation
 import IOKit
@@ -156,7 +156,7 @@ func wantsMacMiniMode() -> Bool {
 
 // 第二道保險。disablesleep 管的是合蓋睡眠，但別的程式改電源設定時會把它清掉；
 // 這個斷言管空閒睡眠，在 disablesleep 被清掉到我們補回去之間，機器不會因為沒人操作而睡著。
-// 另外再拿一個防顯示器睡眠的斷言：顯示器一睡，遠端桌面就只看得到黑屏。合蓋時背光由選單欄關掉。
+// 另外再拿一個防顯示器睡眠的斷言：顯示器一睡，遠端桌面就只看得到黑屏。合蓋時背光由選單列關掉。
 func holdAssertion(_ on: Bool) {
     holdAssertion(on, type: "PreventSystemSleep", id: &State.assertion)
     holdAssertion(on, type: "PreventUserIdleDisplaySleep", id: &State.displayAssertion)
@@ -293,7 +293,7 @@ if !dryRun,
 }
 
 notify_register_check("\(notifyPrefix).state", &State.stateToken)
-// 選單欄的體檢視窗從這裡讀「被其他程式改動了多少次」。
+// 選單列的診斷視窗從這裡讀「被其他程式改動了多少次」。
 notify_register_check("\(notifyPrefix).overrides", &State.overridesToken)
 notify_set_state(State.overridesToken, 0)
 var commandTokens: [Int32] = []

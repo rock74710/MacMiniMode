@@ -3,7 +3,7 @@
 #   macminimode            檢視狀態 / show status
 #   macminimode auto|on|off  切換模式 / switch mode
 #   macminimode log [N]    最近 N 行日誌 / last N log lines
-#   macminimode check      體檢並輸出診斷資訊 / health check and diagnostics
+#   macminimode check      檢查並輸出診斷資訊 / health check and diagnostics
 #   macminimode screen-on  開蓋後螢幕仍是黑的時，把背光開啟 / turn the backlight back on
 # 快捷指令裡用「執行 Shell 指令碼」呼叫即可。In Shortcuts, call it from "Run Shell Script".
 

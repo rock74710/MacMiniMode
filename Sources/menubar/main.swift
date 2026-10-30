@@ -1,5 +1,5 @@
-// macmini-menubar — 選單欄圖示，顯示 Mac mini 模式當前狀態，並可手動切換模式（不需要 root）。
-// 體檢視窗在 Health.swift，合蓋熄屏在 LidScreen.swift。
+// macmini-menubar — 選單列圖示，顯示 Mac mini 模式當前狀態，並可手動切換模式（不需要 root）。
+// 診斷視窗在 Health.swift，合蓋熄屏在 LidScreen.swift。
 // 切換通過 Darwin 通知發給 macmini-moded，由它去改系統設定。
 
 import AppKit
@@ -100,7 +100,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                                   "Only the backlight is switched off; the Mac does not lock. If the screen is still dark after opening the lid, press the brightness-up key (F2).")
         menu.addItem(lidScreenItem)
         menu.addItem(.separator())
-        let healthItem = NSMenuItem(title: L("體檢…", "Health Check…"), action: #selector(openHealth), keyEquivalent: "")
+        let healthItem = NSMenuItem(title: L("診斷…", "Health Check…"), action: #selector(openHealth), keyEquivalent: "")
         healthItem.target = self
         menu.addItem(healthItem)
         let logItem = NSMenuItem(title: L("檢視日誌", "View Log"), action: #selector(openLog), keyEquivalent: "l")
@@ -165,7 +165,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             alert.alertStyle = .warning
             alert.messageText = L("未能確認防休眠已關閉", "Could Not Confirm Sleep Is Allowed")
             alert.informativeText = L(
-                "App 尚未退出。請檢視「體檢」或日誌，解決問題後再退出。",
+                "App 尚未退出。請檢視「診斷」或日誌，解決問題後再退出。",
                 "The app is still running. Check Health Check or View Log, then try quitting again.")
             alert.addButton(withTitle: L("好", "OK"))
             NSApp.activate(ignoringOtherApps: true)
@@ -233,7 +233,7 @@ if CommandLine.arguments.contains("--screen-on") {
     exit(LidScreen().forceOn() ? 0 : 1)
 }
 
-// 命令列的 `macminimode check` 走這裡：把體檢結果和診斷資訊打印出來就退出，不啟動介面。
+// 命令列的 `macminimode check` 走這裡：把診斷結果和診斷資訊印出出來就退出，不啟動介面。
 if CommandLine.arguments.contains("--print-diagnostics") {
     print(Health.report(Health.run()))
     exit(0)
