@@ -19,8 +19,14 @@ PKG=$BUILD/MacMiniMode-$VERSION.pkg
 find_identity() {
     security find-identity -v | sed -n "s/.*\"\($1: .*\)\"/\1/p" | head -n 1
 }
-APP_IDENTITY=${APP_IDENTITY:-$(find_identity "Developer ID Application")}
-PKG_IDENTITY=${PKG_IDENTITY:-$(find_identity "Developer ID Installer")}
+# ADHOC=1：本机自用，不去钥匙串里找证书，一律 ad-hoc 签名、安装包不签名。
+if [ "${ADHOC:-0}" = 1 ]; then
+    APP_IDENTITY=""
+    PKG_IDENTITY=""
+else
+    APP_IDENTITY=${APP_IDENTITY:-$(find_identity "Developer ID Application")}
+    PKG_IDENTITY=${PKG_IDENTITY:-$(find_identity "Developer ID Installer")}
+fi
 NOTARY_PROFILE=${NOTARY_PROFILE:-}
 
 compile() {
@@ -32,7 +38,7 @@ compile() {
     lipo -create "$BUILD/obj/$name-arm64" "$BUILD/obj/$name-x86_64" -output "$output"
 }
 
-echo "==> 编译 $VERSION（arm64 + x86_64）"
+echo "==> 编译 ${VERSION}（arm64 + x86_64）"
 rm -rf "$BUILD"
 mkdir -p "$BUILD/obj" "$APP/Contents/MacOS" "$APP/Contents/Resources" \
     "$(dirname "$DAEMON")" "$ROOT/Library/LaunchDaemons" "$ROOT/Library/LaunchAgents"
@@ -60,7 +66,8 @@ fi
 echo "==> 打包"
 # 不关掉 relocatable 的话，安装器会把应用装到它在磁盘上找到的同名副本那里。
 pkgbuild --analyze --root "$ROOT" "$BUILD/component.plist" >/dev/null
-/usr/libexec/PlistBuddy -c "Set :0:BundleIsRelocatable false" "$BUILD/component.plist"
+/usr/libexec/PlistBuddy -c "Set :0:BundleIsRelocatable false" "$BUILD/component.plist" 2>/dev/null \
+    || /usr/libexec/PlistBuddy -c "Add :0:BundleIsRelocatable bool false" "$BUILD/component.plist"
 pkgbuild --root "$ROOT" \
     --component-plist "$BUILD/component.plist" \
     --scripts Installer/scripts \
