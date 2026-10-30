@@ -51,6 +51,7 @@ enum State {
     nonisolated(unsafe) static var applied: Bool?
     nonisolated(unsafe) static var stateToken: Int32 = 0
     nonisolated(unsafe) static var assertion: IOPMAssertionID = 0
+    nonisolated(unsafe) static var displayAssertion: IOPMAssertionID = 0
     nonisolated(unsafe) static var overrides = 0
     nonisolated(unsafe) static var burstStart = Date.distantPast
     nonisolated(unsafe) static var burst = 0
@@ -155,24 +156,30 @@ func wantsMacMiniMode() -> Bool {
 
 // 第二道保险。disablesleep 管的是合盖睡眠，但别的程序改电源设置时会把它清掉；
 // 这个断言管空闲睡眠，在 disablesleep 被清掉到我们补回去之间，机器不会因为没人操作而睡着。
+// 另外再拿一个防显示器睡眠的断言：显示器一睡，远程桌面就只看得到黑屏。合盖时背光由菜单栏关掉。
 func holdAssertion(_ on: Bool) {
-    if on, State.assertion == 0 {
-        var id: IOPMAssertionID = 0
+    holdAssertion(on, type: "PreventSystemSleep", id: &State.assertion)
+    holdAssertion(on, type: "PreventUserIdleDisplaySleep", id: &State.displayAssertion)
+}
+
+func holdAssertion(_ on: Bool, type: String, id: inout IOPMAssertionID) {
+    if on, id == 0 {
+        var newID: IOPMAssertionID = 0
         let result = IOPMAssertionCreateWithName(
-            "PreventSystemSleep" as CFString, IOPMAssertionLevel(kIOPMAssertionLevelOn),
-            "Mac mini Mode" as CFString, &id)
+            type as CFString, IOPMAssertionLevel(kIOPMAssertionLevelOn),
+            "Mac mini Mode" as CFString, &newID)
         if result == kIOReturnSuccess {
-            State.assertion = id
+            id = newID
         } else {
-            log(L("创建防睡眠断言失败", "Could not create the sleep assertion") + " (\(result))")
+            log(L("创建防睡眠断言失败", "Could not create the sleep assertion") + " \(type) (\(result))")
         }
-    } else if !on, State.assertion != 0 {
-        let result = IOPMAssertionRelease(State.assertion)
+    } else if !on, id != 0 {
+        let result = IOPMAssertionRelease(id)
         guard result == kIOReturnSuccess else {
-            log(L("释放防睡眠断言失败", "Could not release the sleep assertion") + " (\(result))")
+            log(L("释放防睡眠断言失败", "Could not release the sleep assertion") + " \(type) (\(result))")
             return
         }
-        State.assertion = 0
+        id = 0
     }
 }
 
