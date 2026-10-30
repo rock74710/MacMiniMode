@@ -1,6 +1,6 @@
-// macmini-menubar — 菜单栏图标，显示 Mac mini 模式当前状态，并可手动切换模式（不需要 root）。
-// 体检窗口在 Health.swift，合盖熄屏在 LidScreen.swift。
-// 切换通过 Darwin 通知发给 macmini-moded，由它去改系统设置。
+// macmini-menubar — 選單欄圖示，顯示 Mac mini 模式當前狀態，並可手動切換模式（不需要 root）。
+// 體檢視窗在 Health.swift，合蓋熄屏在 LidScreen.swift。
+// 切換通過 Darwin 通知發給 macmini-moded，由它去改系統設定。
 
 import AppKit
 import IOKit
@@ -10,15 +10,15 @@ import notify
 let logPath = "/var/log/macmini-mode.log"
 let notifyPrefix = "com.macminimode"
 
-// 界面和日志跟随系统首选语言：中文环境用中文，其余用英文。
+// 介面和日誌跟隨系統首選語言：中文環境用中文，其餘用英文。
 let isChinese = Locale.preferredLanguages.first?.hasPrefix("zh") ?? false
 func L(_ zh: String, _ en: String) -> String { isChinese ? zh : en }
 
-// 与 macmini-moded 里 Mode 的 rawValue / name 对应。
+// 與 macmini-moded 裡 Mode 的 rawValue / name 對應。
 let modes: [(name: String, title: String)] = [
-    ("auto", L("自动（插电开启，拔电关闭）", "Automatic (on when plugged in)")),
-    ("on", L("始终开启（用电池也不睡眠）", "Always On (stays awake on battery)")),
-    ("off", L("始终关闭", "Always Off")),
+    ("auto", L("自動（插電開啟，拔電關閉）", "Automatic (on when plugged in)")),
+    ("on", L("始終開啟（用電池也不睡眠）", "Always On (stays awake on battery)")),
+    ("off", L("始終關閉", "Always Off")),
 ]
 
 func rootDomainFlag(_ key: String) -> Bool {
@@ -33,7 +33,7 @@ func rootDomainFlag(_ key: String) -> Bool {
 func powerDescription() -> String {
     let info = IOPSCopyPowerSourcesInfo().takeRetainedValue()
     let type = IOPSGetProvidingPowerSourceType(info).takeUnretainedValue() as String
-    var text = type == kIOPSACPowerValue ? L("电源适配器", "Power Adapter") : L("电池", "Battery")
+    var text = type == kIOPSACPowerValue ? L("電源介面卡", "Power Adapter") : L("電池", "Battery")
     let sources = IOPSCopyPowerSourcesList(info).takeRetainedValue() as [CFTypeRef]
     for source in sources {
         guard let desc = IOPSGetPowerSourceDescription(info, source)?.takeUnretainedValue() as? [String: Any],
@@ -67,13 +67,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     var switchItems: [NSMenuItem] = []
     let health = HealthWindowController()
     let lidScreen = LidScreen()
-    let lidScreenItem = NSMenuItem(title: L("合盖时熄灭屏幕", "Turn Off Screen When Lid Is Closed"), action: #selector(toggleLidScreen), keyEquivalent: "")
+    let lidScreenItem = NSMenuItem(title: L("合蓋時熄滅螢幕", "Turn Off Screen When Lid Is Closed"), action: #selector(toggleLidScreen), keyEquivalent: "")
     var stateToken: Int32 = 0
     var timer: Timer?
     var lidTimer: Timer?
     let termSource = DispatchSource.makeSignalSource(signal: SIGTERM, queue: .main)
-    // 只有点了菜单里的「退出并恢复睡眠」才算用户主动退出。其他途径的退出（系统注销、重启、
-    // 活动监视器、脚本）一律不改模式：把后台服务永久切到关闭必须是明确的用户操作。
+    // 只有點了選單裡的「退出並恢復睡眠」才算使用者主動退出。其他途徑的退出（系統登出、重啟、
+    // 活動監視器、指令碼）一律不改模式：把背景服務永久切到關閉必須是明確的使用者操作。
     private var userRequestedQuit = false
     @MainActor private lazy var quitController = QuitController(
         requestStop: { notify_post("\(notifyPrefix).set-off") },
@@ -96,21 +96,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             menu.addItem(item)
         }
         lidScreenItem.target = self
-        lidScreenItem.toolTip = L("只关背光，不锁屏。万一开盖后屏幕还是黑的，按键盘上的亮度增加键（F2）即可。",
+        lidScreenItem.toolTip = L("只關背光，不鎖屏。萬一開蓋後螢幕還是黑的，按鍵盤上的亮度增加鍵（F2）即可。",
                                   "Only the backlight is switched off; the Mac does not lock. If the screen is still dark after opening the lid, press the brightness-up key (F2).")
         menu.addItem(lidScreenItem)
         menu.addItem(.separator())
-        let healthItem = NSMenuItem(title: L("体检…", "Health Check…"), action: #selector(openHealth), keyEquivalent: "")
+        let healthItem = NSMenuItem(title: L("體檢…", "Health Check…"), action: #selector(openHealth), keyEquivalent: "")
         healthItem.target = self
         menu.addItem(healthItem)
-        let logItem = NSMenuItem(title: L("查看日志", "View Log"), action: #selector(openLog), keyEquivalent: "l")
+        let logItem = NSMenuItem(title: L("檢視日誌", "View Log"), action: #selector(openLog), keyEquivalent: "l")
         logItem.target = self
         menu.addItem(logItem)
         menu.addItem(.separator())
-        let quitItem = NSMenuItem(title: L("退出并恢复睡眠", "Quit and Allow Sleep"),
+        let quitItem = NSMenuItem(title: L("退出並恢復睡眠", "Quit and Allow Sleep"),
                                  action: #selector(quitAndAllowSleep), keyEquivalent: "q")
         quitItem.target = self
-        quitItem.toolTip = L("退出后不再防止 Mac 休眠。", "Quitting stops Mac mini Mode from preventing sleep.")
+        quitItem.toolTip = L("退出後不再防止 Mac 休眠。", "Quitting stops Mac mini Mode from preventing sleep.")
         menu.addItem(quitItem)
         statusItem.menu = menu
 
@@ -128,13 +128,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             CFRunLoopAddSource(CFRunLoopGetMain(), source, .commonModes)
         }
         timer = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] _ in self?.refresh() }
-        // 合盖要尽快反应，单独每秒看一次盖子；只读一个系统属性，开销可以忽略。
+        // 合蓋要儘快反應，單獨每秒看一次蓋子；只讀一個系統屬性，開銷可以忽略。
         lidTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
             self?.lidScreen.tick(modeOn: rootDomainFlag("SleepDisabled"), lidClosed: rootDomainFlag("AppleClamshellState"))
         }
-        // 上次如果没来得及恢复亮度（比如被强制结束），启动时补上。
+        // 上次如果沒來得及恢復亮度（比如被強制結束），啟動時補上。
         if !rootDomainFlag("AppleClamshellState") { lidScreen.restore() }
-        // 安装器升级时会用信号结束这个进程，退出前先把亮度还回去。
+        // 安裝器升級時會用訊號結束這個程序，退出前先把亮度還回去。
         signal(SIGTERM, SIG_IGN)
         termSource.setEventHandler { [weak self] in
             self?.lidScreen.restore()
@@ -153,7 +153,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
-        // 系统退出不等于用户主动关闭 App，不能在重启或注销时永久关闭自动模式。
+        // 系統退出不等於使用者主動關閉 App，不能在重啟或登出時永久關閉自動模式。
         guard userRequestedQuit,
               !QuitPolicy.isSystemQuit(NSAppleEventManager.shared().currentAppleEvent) else { return .terminateNow }
         quitController.begin { [weak self] stopped in
@@ -163,9 +163,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             self?.refresh()
             let alert = NSAlert()
             alert.alertStyle = .warning
-            alert.messageText = L("未能确认防休眠已关闭", "Could Not Confirm Sleep Is Allowed")
+            alert.messageText = L("未能確認防休眠已關閉", "Could Not Confirm Sleep Is Allowed")
             alert.informativeText = L(
-                "App 尚未退出。请查看「体检」或日志，解决问题后再退出。",
+                "App 尚未退出。請檢視「體檢」或日誌，解決問題後再退出。",
                 "The app is still running. Check Health Check or View Log, then try quitting again.")
             alert.addButton(withTitle: L("好", "OK"))
             NSApp.activate(ignoringOtherApps: true)
@@ -174,7 +174,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         return .terminateLater
     }
 
-    // 守护进程收到通知后才去改设置，立即读一次，稍等再读一次。
+    // 守護程序收到通知後才去改設定，立即讀一次，稍等再讀一次。
     func refreshSoon() {
         refresh()
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in self?.refresh() }
@@ -191,13 +191,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let image = NSImage(systemSymbolName: symbol, accessibilityDescription: name)
         image?.isTemplate = true
         statusItem.button?.image = image
-        statusItem.button?.toolTip = name + L("：", ": ") + (enabled ? L("开启", "On") : L("关闭", "Off"))
+        statusItem.button?.toolTip = name + L("：", ": ") + (enabled ? L("開啟", "On") : L("關閉", "Off"))
 
         modeItem.title = name + L("：", ": ") + (enabled
-            ? L("开启（合盖继续运行）", "On (keeps running with the lid closed)")
-            : L("关闭（正常睡眠）", "Off (sleeps normally)"))
-        powerItem.title = L("供电：", "Power: ") + powerDescription()
-        daemonItem.title = L("后台服务：", "Background service: ") + (running ? L("运行中", "Running") : L("未运行", "Not running"))
+            ? L("開啟（合蓋繼續執行）", "On (keeps running with the lid closed)")
+            : L("關閉（正常睡眠）", "Off (sleeps normally)"))
+        powerItem.title = L("供電：", "Power: ") + powerDescription()
+        daemonItem.title = L("背景服務：", "Background service: ") + (running ? L("執行中", "Running") : L("未執行", "Not running"))
         for item in switchItems {
             item.isEnabled = running
             item.state = running && item.tag == Int(rawMode) ? .on : .off
@@ -228,12 +228,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 }
 
-// 命令行的 `macminimode screen-on` 走这里：开盖后屏幕万一还是黑的，可以远程执行把背光打开。
+// 命令列的 `macminimode screen-on` 走這裡：開蓋後螢幕萬一還是黑的，可以遠端執行把背光開啟。
 if CommandLine.arguments.contains("--screen-on") {
     exit(LidScreen().forceOn() ? 0 : 1)
 }
 
-// 命令行的 `macminimode check` 走这里：把体检结果和诊断信息打印出来就退出，不启动界面。
+// 命令列的 `macminimode check` 走這裡：把體檢結果和診斷資訊打印出來就退出，不啟動介面。
 if CommandLine.arguments.contains("--print-diagnostics") {
     print(Health.report(Health.run()))
     exit(0)

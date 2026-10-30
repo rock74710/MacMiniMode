@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<!-- 安裝器會把這頁轉成富文本再顯示：只有字型、顏色、段落間距這類樣式有效，
+     flex、邊框、媒體查詢都不生效。正文不指定顏色，讓它跟隨淺色/深色外觀。 -->
+<style>
+    body {
+        margin: 0;
+        font: 13px/1.5 -apple-system, "PingFang SC", sans-serif;
+    }
+    h1 {
+        margin: 0 0 4px;
+        font-size: 22px;
+        font-weight: 700;
+    }
+    p {
+        margin: 0 0 9px;
+    }
+    .lead {
+        margin-bottom: 12px;
+    }
+    .tag {
+        color: #4a7dff;
+        font-weight: 600;
+    }
+    .note {
+        margin: 0;
+        font-size: 11px;
+        color: #8a8a8e;
+    }
+</style>
+</head>
+<body>
+    <h1>Mac mini 模式</h1>
+    <p class="lead">讓插著電的 MacBook 合上蓋子也能一直執行；拔掉電源，它又是一台正常睡眠的筆記本。</p>
+
+    <p><span class="tag">插電</span>　<b>自動開啟</b><br>
+    接入電源後不再睡眠，合上蓋子，服務照常執行。</p>
+
+    <p><span class="tag">拔電</span>　<b>自動關閉</b><br>
+    切到電池即恢復正常睡眠；已合蓋則直接入睡，不會在包裡發熱。</p>
+
+    <p><span class="tag">手動</span>　<b>選單欄切換</b><br>
+    自動、始終開啟、始終關閉三檔，當前狀態一眼可見。</p>
+
+    <p class="note">將安裝一個選單欄應用和一個背景服務，過程需要管理員密碼。</p>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<!-- 同 welcome.html：只用富文本能表達的樣式，正文顏色跟隨系統外觀。 -->
+<style>
+    body {
+        margin: 0;
+        font: 13px/1.5 -apple-system, "PingFang SC", sans-serif;
+    }
+    h1 {
+        margin: 0 0 4px;
+        font-size: 22px;
+        font-weight: 700;
+    }
+    h1 span {
+        color: #2fb463;
+    }
+    p {
+        margin: 0 0 9px;
+    }
+    .lead {
+        margin-bottom: 12px;
+    }
+    code {
+        font: 11px Menlo, monospace;
+        color: #4a7dff;
+    }
+</style>
+</head>
+<body>
+    <h1><span>✓</span> 已經在運行了</h1>
+    <p class="lead">選單欄多了一個圖示，背景服務已啟動，不需要重啟電腦。</p>
+
+    <p><b>看圖示就知道狀態</b><br>
+    Mac mini 圖標表示模式開啟，筆記本圖標表示關閉。點開可以切換三檔模式，「體檢」會檢查遠端登入等設定是否就緒。</p>
+
+    <p><b>建議順手做一件事</b><br>
+    長期插電使用時，到「系統設定 → 電池」把充電上限設為 80%，對電池更友好。</p>
+
+    <p><b>想解除安裝時</b><br>
+    在終端執行下面這行，睡眠設定會一併恢復：<br>
+    <code>sudo /Applications/MacMiniMode.app/Contents/Resources/uninstall.sh</code></p>
+</body>
+</html>

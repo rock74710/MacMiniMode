@@ -1,5 +1,5 @@
-// 生成应用图标和安装器背景图。用法：swift scripts/make-assets.swift
-// 输出：Resources/AppIcon.icns、Installer/Resources/background.png、docs/social-preview.png
+// 生成應用圖示和安裝器背景圖。用法：swift scripts/make-assets.swift
+// 輸出：Resources/AppIcon.icns、Installer/Resources/background.png、docs/social-preview.png
 
 import AppKit
 
@@ -28,7 +28,7 @@ func rgb(_ r: CGFloat, _ g: CGFloat, _ b: CGFloat, _ a: CGFloat = 1) -> NSColor 
     NSColor(deviceRed: r, green: g, blue: b, alpha: a)
 }
 
-// 闪电：在 unit × unit 的方框内，原点为左下角。
+// 閃電：在 unit × unit 的方框內，原點為左下角。
 func boltPath(in rect: NSRect) -> NSBezierPath {
     let points: [(CGFloat, CGFloat)] = [
         (0.58, 1.00), (0.12, 0.44), (0.44, 0.44), (0.36, 0.00), (0.88, 0.60), (0.54, 0.60),
@@ -43,7 +43,7 @@ func boltPath(in rect: NSRect) -> NSBezierPath {
     return path
 }
 
-// 机身：一块圆角扁盒，Mac mini 的正面。
+// 機身：一塊圓角扁盒，Mac mini 的正面。
 func slabPath(in rect: NSRect) -> NSBezierPath {
     NSBezierPath(roundedRect: rect, xRadius: rect.height * 0.27, yRadius: rect.height * 0.27)
 }
@@ -66,14 +66,14 @@ func drawIcon(_ s: CGFloat) {
     NSGradient(colors: [rgb(0.05, 0.07, 0.15), rgb(0.13, 0.19, 0.38), rgb(0.24, 0.33, 0.62)])!
         .draw(in: platePath, angle: 90)
 
-    // 顶部一抹高光，让底板不那么平。
+    // 頂部一抹高光，讓底板不那麼平。
     NSGraphicsContext.saveGraphicsState()
     platePath.addClip()
     NSGradient(colors: [rgb(1, 1, 1, 0), rgb(1, 1, 1, 0.14)])!
         .draw(in: NSRect(x: plate.minX, y: plate.midY, width: plate.width, height: plate.height / 2), angle: 90)
     NSGraphicsContext.restoreGraphicsState()
 
-    // 闪电
+    // 閃電
     let bolt = boltPath(in: NSRect(x: 392 * u, y: 520 * u, width: 240 * u, height: 290 * u))
     NSGraphicsContext.saveGraphicsState()
     let glow = NSShadow()
@@ -85,7 +85,7 @@ func drawIcon(_ s: CGFloat) {
     NSGraphicsContext.restoreGraphicsState()
     NSGradient(colors: [rgb(1.0, 0.70, 0.18), rgb(1.0, 0.90, 0.45)])!.draw(in: bolt, angle: 90)
 
-    // 机身
+    // 機身
     let slabRect = NSRect(x: 222 * u, y: 258 * u, width: 580 * u, height: 190 * u)
     let slab = slabPath(in: slabRect)
     NSGraphicsContext.saveGraphicsState()
@@ -100,7 +100,7 @@ func drawIcon(_ s: CGFloat) {
     NSGradient(colors: [rgb(0.74, 0.76, 0.80), rgb(0.90, 0.91, 0.93), rgb(0.98, 0.98, 0.99)])!
         .draw(in: slab, angle: 90)
 
-    // 电源指示灯
+    // 電源指示燈
     let led = NSRect(x: slabRect.maxX - 78 * u, y: slabRect.midY - 11 * u, width: 22 * u, height: 22 * u)
     NSGraphicsContext.saveGraphicsState()
     let ledGlow = NSShadow()
@@ -112,7 +112,7 @@ func drawIcon(_ s: CGFloat) {
     NSGraphicsContext.restoreGraphicsState()
 }
 
-// 安装器背景：左侧步骤列表下方放一个应用图标，其余透明。
+// 安裝器背景：左側步驟列表下方放一個應用圖示，其餘透明。
 func drawBackground() {
     let transform = NSAffineTransform()
     transform.translateX(by: 30, yBy: 26)
@@ -120,12 +120,12 @@ func drawBackground() {
     drawIcon(120)
 }
 
-// GitHub 社交预览图，1280×640。重要内容离边缘至少 80px，避免被各平台裁掉。
+// GitHub 社交預覽圖，1280×640。重要內容離邊緣至少 80px，避免被各平台裁掉。
 func drawSocialPreview() {
     let canvas = NSRect(x: 0, y: 0, width: 1280, height: 640)
     NSGradient(colors: [rgb(0.04, 0.05, 0.12), rgb(0.09, 0.13, 0.28), rgb(0.17, 0.24, 0.48)])!
         .draw(in: canvas, angle: 35)
-    // 图标背后的一团光，把它从同色系的背景里托出来。
+    // 圖示背後的一團光，把它從同色系的背景裡托出來。
     NSGradient(colors: [rgb(0.42, 0.55, 1.0, 0.38), rgb(0.42, 0.55, 1.0, 0)])!
         .draw(fromCenter: NSPoint(x: 290, y: 320), radius: 0, toCenter: NSPoint(x: 290, y: 320), radius: 380, options: [])
 
@@ -184,7 +184,7 @@ write(render(pixelsWide: 1240, pixelsHigh: 836, pointSize: paneSize, drawBackgro
 write(render(pixelsWide: 1280, pixelsHigh: 640, pointSize: NSSize(width: 1280, height: 640), drawSocialPreview),
       to: "docs/social-preview.png")
 
-// 预览用的大图，不入库。
+// 預覽用的大圖，不入庫。
 if CommandLine.arguments.contains("--preview") {
     try? fm.createDirectory(atPath: "build", withIntermediateDirectories: true)
     write(render(pixels: 512, points: 512, drawIcon), to: "build/icon-preview.png")

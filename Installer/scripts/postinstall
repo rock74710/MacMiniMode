@@ -1,12 +1,12 @@
 #!/bin/bash
-# 启动守护进程，并为当前登录用户拉起菜单栏图标（其他用户下次登录时自动启动）。
+# 啟動守護程序，併為當前登入使用者拉起選單欄圖示（其他使用者下次登入時自動啟動）。
 
 CONSOLE_UID=$(stat -f %u /dev/console)
 
 launchctl bootstrap system /Library/LaunchDaemons/com.macminimode.daemon.plist
 
-# 命令行入口。用软链接而不是把文件装进 /usr/local/bin，免得安装器改动那个目录的权限。
-# 那里已经有一个不是我们的同名文件时不去碰它。
+# 命令列入口。用軟連結而不是把檔案裝進 /usr/local/bin，免得安裝器改動那個目錄的許可權。
+# 那裡已經有一個不是我們的同名檔案時不去碰它。
 CLI=/usr/local/bin/macminimode
 mkdir -p /usr/local/bin
 if [ -L "$CLI" ] || [ ! -e "$CLI" ]; then

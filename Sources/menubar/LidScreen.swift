@@ -1,7 +1,7 @@
-// 合盖后关掉盖子里那块屏幕的背光，开盖时恢复原来的亮度。
-// Mac mini 模式下系统不睡眠，如果显示器睡眠被设成「永不」（远程桌面软件常这么做），合盖后屏幕会一直亮着。
-// 只关背光、不让显示器睡眠：显示器一睡就会触发锁屏，还会打断视频通话和远程桌面这类正在用屏幕的应用。
-// 亮度会被系统记住，所以原来的值存进偏好设置，开盖、退出、被终止、下次启动时都会尝试恢复。
+// 合蓋後關掉蓋子裡那塊螢幕的背光，開蓋時恢復原來的亮度。
+// Mac mini 模式下系統不睡眠，如果顯示器睡眠被設成「永不」（遠端桌面軟體常這麼做），合蓋後螢幕會一直亮著。
+// 只關背光、不讓顯示器睡眠：顯示器一睡就會觸發鎖屏，還會打斷視訊通話和遠端桌面這類正在用螢幕的應用。
+// 亮度會被系統記住，所以原來的值存進偏好設定，開蓋、退出、被終止、下次啟動時都會嘗試恢復。
 
 import AppKit
 
@@ -15,7 +15,7 @@ final class LidScreen {
     private let setBrightness: SetBrightness?
 
     init() {
-        // 系统自带的亮度接口，没有公开头文件，运行时查找；找不到就什么都不做。
+        // 系統自帶的亮度介面，沒有公開標頭檔案，執行時查詢；找不到就什麼都不做。
         let handle = dlopen("/System/Library/PrivateFrameworks/DisplayServices.framework/DisplayServices", RTLD_LAZY)
         getBrightness = handle.flatMap { dlsym($0, "DisplayServicesGetBrightness") }.map { unsafeBitCast($0, to: GetBrightness.self) }
         setBrightness = handle.flatMap { dlsym($0, "DisplayServicesSetBrightness") }.map { unsafeBitCast($0, to: SetBrightness.self) }
@@ -45,7 +45,7 @@ final class LidScreen {
         return (online.first { CGDisplayIsBuiltin($0) != 0 }, online.contains { CGDisplayIsBuiltin($0) == 0 })
     }
 
-    /// 接着外接显示器时不动：那时系统自己会关掉内建屏幕。
+    /// 接著外接顯示器時不動：那時系統自己會關掉內建螢幕。
     static func shouldDim(enabled: Bool, lidClosed: Bool, modeOn: Bool, hasBuiltin: Bool, hasExternal: Bool) -> Bool {
         enabled && lidClosed && modeOn && hasBuiltin && !hasExternal
     }
@@ -57,7 +57,7 @@ final class LidScreen {
            let builtin {
             var current: Float = 0
             guard getBrightness(builtin, &current) == 0, current > 0.001 else { return }
-            // 只在第一次记下原来的亮度；之后如果亮度被别的东西调高，再压回 0，但不覆盖记下的值。
+            // 只在第一次記下原來的亮度；之後如果亮度被別的東西調高，再壓回 0，但不覆蓋記下的值。
             if saved == nil { saved = current }
             _ = setBrightness(builtin, 0)
         } else if !lidClosed || !enabled {
@@ -65,13 +65,13 @@ final class LidScreen {
         }
     }
 
-    /// 把亮度恢复成合盖前的值。内建屏幕暂时不在线时保留记录，下次再试。
+    /// 把亮度恢復成合蓋前的值。內建螢幕暫時不線上時保留記錄，下次再試。
     func restore() {
         guard let setBrightness, let value = saved, let builtin = displays().builtin else { return }
         if setBrightness(builtin, value) == 0 { saved = nil }
     }
 
-    /// 应急用（命令行 `macminimode screen-on`）：先按记录恢复；没有记录而屏幕仍然是黑的，就直接调到一个看得见的亮度。
+    /// 應急用（命令列 `macminimode screen-on`）：先按記錄恢復；沒有記錄而螢幕仍然是黑的，就直接調到一個看得見的亮度。
     func forceOn() -> Bool {
         restore()
         guard let getBrightness, let setBrightness, let builtin = displays().builtin else { return false }

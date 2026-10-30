@@ -9,10 +9,10 @@
 <p align="center">
   <a href="https://github.com/Pama-Lee/MacMiniMode/releases/latest/download/MacMiniMode.pkg"><img src="docs/download-en.svg" height="48" alt="Download for macOS"></a>
   &nbsp;
-  <a href="https://github.com/Pama-Lee/MacMiniMode/releases/latest/download/MacMiniMode.pkg"><img src="docs/download-zh.svg" height="48" alt="下载安装包"></a>
+  <a href="https://github.com/Pama-Lee/MacMiniMode/releases/latest/download/MacMiniMode.pkg"><img src="docs/download-zh.svg" height="48" alt="下載安裝包"></a>
 </p>
 
-<p align="center"><b>English</b> · <a href="README.zh-CN.md">简体中文（安装说明）</a></p>
+<p align="center"><b>English</b> · <a href="README.zh-TW.md">繁體中文（安裝說明）</a></p>
 
 ## Install
 

@@ -1,5 +1,5 @@
 #!/bin/bash
-# 升级安装前先停掉旧版本。守护进程收到 SIGTERM 会自己恢复 disablesleep 0。
+# 升級安裝前先停掉舊版本。守護程序收到 SIGTERM 會自己恢復 disablesleep 0。
 
 CONSOLE_UID=$(stat -f %u /dev/console)
 

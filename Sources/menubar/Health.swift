@@ -1,5 +1,5 @@
-// 体检：把「当 Mac mini 用」需要的几样东西逐项查一遍，并能把诊断信息复制出来。
-// 全部是只读检查，不改任何设置。
+// 體檢：把「當 Mac mini 用」需要的幾樣東西逐項查一遍，並能把診斷資訊複製出來。
+// 全部是隻讀檢查，不改任何設定。
 
 import AppKit
 import notify
@@ -38,63 +38,63 @@ enum Health {
         shell("/usr/bin/nc -z -G 1 127.0.0.1 \(port)").status == 0
     }
 
-    /// 会跑几个系统命令，放在后台线程调用。
+    /// 會跑幾個系統命令，放在背景執行緒呼叫。
     static func run() -> [HealthCheck] {
         var checks: [HealthCheck] = []
         let running = daemonRunning()
         checks.append(running
-            ? HealthCheck(level: .ok, title: L("后台服务运行中", "Background service is running"), detail: "")
-            : HealthCheck(level: .warn, title: L("后台服务没有运行", "Background service is not running"),
-                          detail: L("重新安装一次即可恢复。", "Reinstalling the app will bring it back.")))
+            ? HealthCheck(level: .ok, title: L("背景服務執行中", "Background service is running"), detail: "")
+            : HealthCheck(level: .warn, title: L("背景服務沒有執行", "Background service is not running"),
+                          detail: L("重新安裝一次即可恢復。", "Reinstalling the app will bring it back.")))
 
         let awake = rootDomainFlag("SleepDisabled")
         checks.append(awake
-            ? HealthCheck(level: .ok, title: L("Mac mini 模式已开启", "Mac mini Mode is on"),
-                          detail: L("现在合上盖子，电脑会继续运行。", "Close the lid now and the Mac keeps running."))
-            : HealthCheck(level: .info, title: L("Mac mini 模式当前关闭", "Mac mini Mode is currently off"),
-                          detail: L("没插电，或设定为「始终关闭」。现在合盖会正常睡眠。", "On battery, or set to Always Off. Closing the lid will sleep as usual.")))
+            ? HealthCheck(level: .ok, title: L("Mac mini 模式已開啟", "Mac mini Mode is on"),
+                          detail: L("現在合上蓋子，電腦會繼續執行。", "Close the lid now and the Mac keeps running."))
+            : HealthCheck(level: .info, title: L("Mac mini 模式當前關閉", "Mac mini Mode is currently off"),
+                          detail: L("沒插電，或設定為「始終關閉」。現在合蓋會正常睡眠。", "On battery, or set to Always Off. Closing the lid will sleep as usual.")))
 
         let overrides = notifyState("com.macminimode.overrides")
         checks.append(overrides == 0
-            ? HealthCheck(level: .ok, title: L("没有其他软件改动电源设置", "No other software has changed power settings"), detail: "")
-            : HealthCheck(level: .info, title: L("其他软件改动过电源设置 \(overrides) 次，都已自动恢复", "Other software changed power settings \(overrides) times; all restored"),
-                          detail: L("常见于远程桌面、清理优化类软件，不影响使用。", "Usually a remote desktop or cleaner app. Nothing to do.")))
+            ? HealthCheck(level: .ok, title: L("沒有其他軟體改動電源設定", "No other software has changed power settings"), detail: "")
+            : HealthCheck(level: .info, title: L("其他軟體改動過電源設定 \(overrides) 次，都已自動恢復", "Other software changed power settings \(overrides) times; all restored"),
+                          detail: L("常見於遠端桌面、清理最佳化類軟體，不影響使用。", "Usually a remote desktop or cleaner app. Nothing to do.")))
 
         checks.append(portOpen(22)
-            ? HealthCheck(level: .ok, title: L("远程登录（SSH）已开启", "Remote Login (SSH) is on"), detail: "")
-            : HealthCheck(level: .info, title: L("远程登录（SSH）未开启", "Remote Login (SSH) is off"),
-                          detail: L("需要的话，到 系统设置 → 通用 → 共享 打开「远程登录」。", "If you need it, turn on Remote Login in System Settings → General → Sharing.")))
+            ? HealthCheck(level: .ok, title: L("遠端登入（SSH）已開啟", "Remote Login (SSH) is on"), detail: "")
+            : HealthCheck(level: .info, title: L("遠端登入（SSH）未開啟", "Remote Login (SSH) is off"),
+                          detail: L("需要的話，到 系統設定 → 通用 → 共享 開啟「遠端登入」。", "If you need it, turn on Remote Login in System Settings → General → Sharing.")))
         checks.append(portOpen(5900)
-            ? HealthCheck(level: .ok, title: L("屏幕共享已开启", "Screen Sharing is on"), detail: "")
-            : HealthCheck(level: .info, title: L("屏幕共享未开启", "Screen Sharing is off"),
-                          detail: L("需要远程看桌面的话，到 系统设置 → 通用 → 共享 打开「屏幕共享」。", "To view the desktop remotely, turn on Screen Sharing in System Settings → General → Sharing.")))
+            ? HealthCheck(level: .ok, title: L("螢幕共享已開啟", "Screen Sharing is on"), detail: "")
+            : HealthCheck(level: .info, title: L("螢幕共享未開啟", "Screen Sharing is off"),
+                          detail: L("需要遠端看桌面的話，到 系統設定 → 通用 → 共享 開啟「螢幕共享」。", "To view the desktop remotely, turn on Screen Sharing in System Settings → General → Sharing.")))
 
         let battery = shell("/usr/bin/pmset -g ps").output
         if let range = battery.range(of: #"[0-9]+%"#, options: .regularExpression),
            let percent = Int(battery[range].dropLast()) {
             let plugged = battery.contains("AC Power")
             checks.append(plugged && percent >= 95
-                ? HealthCheck(level: .warn, title: L("电量 \(percent)%，一直充到接近满电", "Battery at \(percent)% and held near full"),
-                              detail: L("长期插电建议到 系统设置 → 电池 把充电上限设为 80%，对电池更好。", "If it stays plugged in, set the charge limit to 80% in System Settings → Battery."))
-                : HealthCheck(level: .ok, title: L("电量 \(percent)%", "Battery at \(percent)%"), detail: ""))
+                ? HealthCheck(level: .warn, title: L("電量 \(percent)%，一直充到接近滿電", "Battery at \(percent)% and held near full"),
+                              detail: L("長期插電建議到 系統設定 → 電池 把充電上限設為 80%，對電池更好。", "If it stays plugged in, set the charge limit to 80% in System Settings → Battery."))
+                : HealthCheck(level: .ok, title: L("電量 \(percent)%", "Battery at \(percent)%"), detail: ""))
         }
 
         if shell("/usr/bin/fdesetup status").output.contains("FileVault is On") {
-            checks.append(HealthCheck(level: .info, title: L("已开启 FileVault", "FileVault is on"),
-                                      detail: L("断电重启后，要先在这台电脑上输入一次密码，远程才连得上。", "After a power loss and restart, the Mac needs its password typed locally before you can connect remotely.")))
+            checks.append(HealthCheck(level: .info, title: L("已開啟 FileVault", "FileVault is on"),
+                                      detail: L("斷電重啟後，要先在這台電腦上輸入一次密碼，遠端才連得上。", "After a power loss and restart, the Mac needs its password typed locally before you can connect remotely.")))
         }
 
         switch ProcessInfo.processInfo.thermalState {
         case .serious, .critical:
-            checks.append(HealthCheck(level: .warn, title: L("机器温度偏高", "The Mac is running hot"),
-                                      detail: L("合盖运行时把它放在通风的地方，最好竖起来放。", "Keep it somewhere ventilated when running with the lid closed, ideally upright.")))
+            checks.append(HealthCheck(level: .warn, title: L("機器溫度偏高", "The Mac is running hot"),
+                                      detail: L("合蓋執行時把它放在通風的地方，最好豎起來放。", "Keep it somewhere ventilated when running with the lid closed, ideally upright.")))
         default:
-            checks.append(HealthCheck(level: .ok, title: L("温度正常", "Temperature is normal"), detail: ""))
+            checks.append(HealthCheck(level: .ok, title: L("溫度正常", "Temperature is normal"), detail: ""))
         }
         return checks
     }
 
-    /// 给用户贴到反馈里的文本。只读取，不上传。
+    /// 給使用者貼到反饋裡的文本。只讀取，不上傳。
     static func report(_ checks: [HealthCheck]) -> String {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
         let system = ProcessInfo.processInfo.operatingSystemVersionString
@@ -110,7 +110,7 @@ enum Health {
         lines.append("\n[pmset]")
         lines.append(shell("/usr/bin/pmset -g | grep -E 'SleepDisabled|hibernatemode|standby |powernap| sleep |displaysleep|lidwake|womp' | cut -c1-110").output)
         lines.append("[assertions]")
-        // 我们自己的那条放最前面，其余按进程去重，免得被同一个进程的十几条刷掉。
+        // 我們自己的那條放最前面，其餘按程序去重，免得被同一個程序的十幾條刷掉。
         lines.append(shell("/usr/bin/pmset -g assertions | grep 'pid ' | grep -E 'PreventSystemSleep|PreventUserIdleSystemSleep' | awk '/macmini-moded/ {print; next} !seen[$2]++ {rest[n++] = $0} END {for (i = 0; i < n && i < 8; i++) print rest[i]}' | cut -c1-150").output)
         lines.append("[sleep / wake, last 15]")
         lines.append(shell("/usr/bin/pmset -g log | grep -E '^[0-9-]+ [0-9:]+ [+-][0-9]+ (Sleep|Wake|DarkWake)  ' | tail -n 15 | cut -c1-170").output)
@@ -140,17 +140,17 @@ final class HealthWindowController: NSObject {
         rows.alignment = .leading
         rows.spacing = 12
 
-        copyButton.title = L("复制诊断信息", "Copy Diagnostics")
+        copyButton.title = L("複製診斷資訊", "Copy Diagnostics")
         copyButton.target = self
         copyButton.action = #selector(copyReport)
         copyButton.bezelStyle = .rounded
-        refreshButton.title = L("重新检查", "Check Again")
+        refreshButton.title = L("重新檢查", "Check Again")
         refreshButton.target = self
         refreshButton.action = #selector(refresh)
         refreshButton.bezelStyle = .rounded
 
         let note = NSTextField(wrappingLabelWithString: L(
-            "反馈问题时，点「复制诊断信息」把结果贴给开发者。内容只会放进剪贴板，不会上传。",
+            "反饋問題時，點「複製診斷資訊」把結果貼給開發者。內容只會放進剪貼簿，不會上傳。",
             "When reporting a problem, use Copy Diagnostics and paste the result. It only goes to your clipboard; nothing is uploaded."))
         note.font = .systemFont(ofSize: 11)
         note.textColor = .secondaryLabelColor
@@ -168,7 +168,7 @@ final class HealthWindowController: NSObject {
 
         let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 468, height: 300),
                               styleMask: [.titled, .closable], backing: .buffered, defer: false)
-        window.title = L("体检", "Health Check")
+        window.title = L("體檢", "Health Check")
         window.isReleasedWhenClosed = false
         let host = NSView()
         host.addSubview(content)
@@ -224,8 +224,8 @@ final class HealthWindowController: NSObject {
     @objc private func refresh() {
         copyButton.isEnabled = false
         refreshButton.isEnabled = false
-        copyButton.title = L("复制诊断信息", "Copy Diagnostics")
-        setRows([row(HealthCheck(level: .info, title: L("正在检查…", "Checking…"), detail: ""))])
+        copyButton.title = L("複製診斷資訊", "Copy Diagnostics")
+        setRows([row(HealthCheck(level: .info, title: L("正在檢查…", "Checking…"), detail: ""))])
         DispatchQueue.global(qos: .userInitiated).async {
             let checks = Health.run()
             DispatchQueue.main.async {
@@ -245,7 +245,7 @@ final class HealthWindowController: NSObject {
             DispatchQueue.main.async {
                 NSPasteboard.general.clearContents()
                 NSPasteboard.general.setString(report, forType: .string)
-                self.copyButton.title = L("已复制", "Copied")
+                self.copyButton.title = L("已複製", "Copied")
                 self.copyButton.isEnabled = true
             }
         }

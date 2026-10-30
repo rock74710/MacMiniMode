@@ -1,4 +1,4 @@
-// 退出前确认后台已停止防休眠；不把「收到关闭请求」当作「已恢复睡眠」。
+// 退出前確認背景已停止防休眠；不把「收到關閉請求」當作「已恢復睡眠」。
 
 import Foundation
 import CoreServices
@@ -27,7 +27,7 @@ final class QuitController {
         pending = true
         requestStop()
         let deadline = DispatchTime.now() + timeout
-        // AppKit 必须先收到 terminateLater，再收到退出结果。
+        // AppKit 必須先收到 terminateLater，再收到退出結果。
         DispatchQueue.main.async { self.poll(until: deadline, completion: completion) }
     }
 
@@ -87,7 +87,7 @@ enum QuitPolicy {
             for assertion in assertions {
                 guard assertion[kIOPMAssertionNameKey as String] as? String == "Mac mini Mode",
                       assertion[kIOPMAssertionTypeKey as String] as? String == "PreventSystemSleep" else { continue }
-                // 无法读取断言状态时保留界面，不能误报退出成功。
+                // 無法讀取斷言狀態時保留介面，不能誤報退出成功。
                 guard let level = assertion[kIOPMAssertionLevelKey as String] as? Int else { return nil }
                 if level != Int(kIOPMAssertionLevelOff) { return false }
             }
