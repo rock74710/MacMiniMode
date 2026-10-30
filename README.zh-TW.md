@@ -7,10 +7,12 @@
 <p align="center">讓插著電的 MacBook 合上蓋子也能一直執行；拔掉電源，它又是一台正常睡眠的筆電。</p>
 
 <p align="center">
-  <a href="https://github.com/Pama-Lee/MacMiniMode/releases/latest/download/MacMiniMode.pkg"><img src="docs/download-zh.svg" height="48" alt="下載安裝包"></a>
+  <a href="https://github.com/rock74710/MacMiniMode/releases/latest/download/MacMiniMode.pkg"><img src="docs/download-zh.svg" height="48" alt="下載安裝包"></a>
 </p>
 
 <p align="center"><a href="README.md">English</a> · <b>繁體中文</b></p>
+
+> 這是 [Pama-Lee/MacMiniMode](https://github.com/Pama-Lee/MacMiniMode) 的 fork：插電時也防止螢幕休眠（遠端連線不黑屏）、移除自動更新、全繁體中文介面與更清楚的選項名稱。
 
 ## 安裝
 

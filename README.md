@@ -7,12 +7,14 @@
 <p align="center">Keep a plugged-in MacBook running with the lid closed. Unplug it and it sleeps like a normal laptop again.</p>
 
 <p align="center">
-  <a href="https://github.com/Pama-Lee/MacMiniMode/releases/latest/download/MacMiniMode.pkg"><img src="docs/download-en.svg" height="48" alt="Download for macOS"></a>
+  <a href="https://github.com/rock74710/MacMiniMode/releases/latest/download/MacMiniMode.pkg"><img src="docs/download-en.svg" height="48" alt="Download for macOS"></a>
   &nbsp;
-  <a href="https://github.com/Pama-Lee/MacMiniMode/releases/latest/download/MacMiniMode.pkg"><img src="docs/download-zh.svg" height="48" alt="下載安裝包"></a>
+  <a href="https://github.com/rock74710/MacMiniMode/releases/latest/download/MacMiniMode.pkg"><img src="docs/download-zh.svg" height="48" alt="下載安裝包"></a>
 </p>
 
 <p align="center"><b>English</b> · <a href="README.zh-TW.md">繁體中文（安裝說明）</a></p>
+
+> Fork of [Pama-Lee/MacMiniMode](https://github.com/Pama-Lee/MacMiniMode): also prevents display sleep on power (no black screen over remote desktop), removes the auto-updater, Traditional Chinese UI, and clearer mode labels.
 
 ## Install
 
